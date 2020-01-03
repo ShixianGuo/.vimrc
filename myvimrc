@@ -1,0 +1,516 @@
+"  __  __        __     _____ __  __ ____   ____
+" |  \/  |_   _  \ \   / /_ _|  \/  |  _ \ / ___|
+" | |\/| | | | |  \ \ / / | || |\/| | |_) | |
+" | |  | | |_| |   \ V /  | || |  | |  _ <| |___
+" |_|  |_|\__, |    \_/  |___|_|  |_|_| \_\\____|
+"         |___/
+
+ 
+" ===
+" === System
+" ===
+ set nocompatible            "去掉有关vi一致性模式，避免以前版本的bug和局限
+ set mouse=a                 "编辑器可以使用鼠标
+ set encoding=utf-8          "编码格式
+ let &t_ut=''                "终端配色适配
+ "set clipboard = unnamed     "默认使用选择缓冲区寄存器 "*
+ set paste
+ filetype on                 "---检测文件的类型
+ filetype indent on
+ filetype plugin on
+ filetype plugin indent on
+
+
+" ===
+" === Main code display
+" === 
+ set nu!                     "显示行号
+ set norelativenumber        "不倒数显示行号
+ set history=1000            "记录历史的行数
+ set background=dark         "背景使用黑色
+ set ruler                   "在编辑过程中，在右下角显示光标位置的状态行
+ set cursorline              "光标线
+ syntax enable               "语法使能
+ syntax on                   "语法高亮度显示
+ 
+
+" ===
+" === Editor behavior
+" ===
+" Better tab
+ set expandtab
+ set tabstop=2                    "设置tab键
+ set shiftwidth=2                 "设置当行之间交错时使用2个空格
+ set softtabstop=2
+ set list                         "---显示行尾空格
+ set listchars=tab:▸\ ,trail:▫
+ set scrolloff=5                  "上下至少显示6行
+
+ " Prevent auto line split
+  set wrap
+  set tw=0
+
+ set indentexpr=
+
+ "Better backspace
+  set backspace=indent,eol,start   "退格键
+
+ set foldmethod=indent       "代码折叠
+ set foldlevel=99
+ 
+ "不同模式显示不同光标
+  let &t_SI = "\<Esc>]50;CursorShape=1\x7"
+  let &t_SR = "\<Esc>]50;CursorShape=2\x7"
+  let &t_EI = "\<Esc>]50;CursorShape=0\x7"
+
+ set guioptions-=T           "去除vim的GUI版本中得toolbar
+ set vb t_vb=                "当vim进行编辑时，如果命令错误，会发出警报，该设置去掉警报
+ 
+ 
+" ===
+" === Window behaviors
+" ===
+ set splitright
+ set splitbelow
+
+
+" ===
+" === Status/command bar
+" ===
+ set laststatus=2   "下面状态栏=2
+ set autochdir      "在当前文件目录下执行命令
+ set showcmd                 "显示敲的命令
+ set formatoptions-=tc
+
+ "Show command autocomplete
+  "set wildignore=log/**,node_modules/**,target/**,tmp/**,*.rbc
+  set wildmenu                                                 " show a navigable menu for tab completion
+  "set wildmode=longest,list,full
+
+ " Searching options
+  set hlsearch                "/搜索高亮
+  exec "nohlsearch"
+  set incsearch               "/边搜边高亮
+  set ignorecase              "搜索忽略大小写
+  set smartcase               "智能大小写
+
+
+" ===
+" === Restore Cursor Position
+" ===
+ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+
+
+" ===
+" === Basic Mappings
+" ===
+ let mapleader=" "          "Set <LEADER> as <SPACE>
+
+ " Column (:) mods
+  map ; :
+  map q; q:
+  map <LEADER>/ :!
+  map <LEADER>r :r !
+  map <LEADER>sr :%s/
+
+ " Save & quit
+  map Q :q<CR>              "退出： q+回车
+  map S :w<CR>              "保存文件： w+回车
+  map s <nop>                 "取消s操作
+
+ " Open the vimrc file anytime
+  map <LEADER>rc :e ~/.vim/vimrc<CR>
+  map R :source $MYVIMRC<CR>               "保存并运行vimrc
+
+ " Copy to system clipboard
+  vnoremap Y :w !xclip -i -sel c<CR>
+
+ " Search
+  noremap = nzz               "搜索匹配并居中(向后)
+  noremap - Nzz
+  noremap <LEADER><CR> :nohlsearch<CR>   " 空格+回车 取消搜索结果
+
+
+" ===
+" === Cursor Movement
+" ===
+ " faster navigation
+  noremap H 7h
+  noremap J 5j
+  noremap K 5k
+  noremap L 7l
+
+ " H key: go to the start of the line
+  noremap H 0
+ " L key: go to the end of the line
+  noremap L $
+
+ " Faster in-line navigation
+  noremap W 5w
+  noremap B 5b
+
+
+" ===
+" === Window management
+" ===
+ " Use <space> + new arrow keys for moving the cursor around windows
+  map <LEADER>w <C-w>w
+  noremap <LEADER>h <C-w>h
+  noremap <LEADER>j <C-w>j
+  noremap <LEADER>k <C-w>k
+  noremap <LEADER>l <C-w>l
+
+ " split the screens to up (horizontal), down (horizontal), left (vertical), right (vertical)
+  map sh :set splitright<CR>:vsplit<CR>      "vsplit 左右分屏
+  map sl :set nosplitright<CR>:vsplit<CR> 
+  map sk :set nosplitbelow<CR>:split<CR>     "split  上下分屏 
+  map sj :set splitbelow<CR>:split<CR>
+
+ " Resize splits with arrow keys
+  map <up> :  res +5<CR>
+  map <down> :res -5<CR>
+  map <left> :vertical resize-5<CR>
+  map <right> :vertical resize+5<CR>
+
+ "-上下分屏与左右分屏互换
+  map sv <C-w>t<C-w>H
+  map sh <C-w>t<C-w>K
+
+
+" ===
+" === Tab management
+" ===
+" Create a new tab with tu
+ map tu :tabe<CR>      "打开新的标签页
+ map th :-tabnext<CR>  "移动到左边的标签页
+ map tl :+tabnext<CR>  "移动到右边的标签页
+
+ 
+" ===
+" === Other useful stuff
+" ===
+ " Press space twice to jump to the next '<++>' and edit it
+  map <LEADER><LEADER> <Esc>/<++><CR>:nohlsearch<CR>c4i
+
+ " Spelling Check with <space>sc
+  map <LEADER>sc :set spell!<CR>
+  noremap <C-x> ea<C-x>s
+  inoremap <C-x> <Esc>ea<C-x>s
+
+ " Press ` to change case (instead of ~)
+  map ` ~
+
+
+" ===
+" === Install Plugins with Vim-Plug
+" ===
+ call plug#begin('~/.vim/plugged')
+
+ " Pretty Dress
+  Plug 'mhinz/vim-startify'                "修改启动界面
+  Plug 'vim-airline/vim-airline'           "状态栏美化
+  Plug 'Yggdroot/indentLine'               "增加代码缩进线条
+  Plug 'itchyny/lightline.vim'             "代码高亮
+  Plug 'octol/vim-cpp-enhanced-highlight'  "语法标注
+  Plug 'connorholyday/vim-snazzy'          "更改配色
+
+ " File navigation
+  Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+  Plug 'Xuyuanp/nerdtree-git-plugin'
+  Plug 'Yggdroot/LeaderF'
+  Plug 'easymotion/vim-easymotion'
+
+ " Taglist
+  Plug 'majutsushi/tagbar', { 'on': 'TagbarOpenAutoClose' }
+
+ " 语法检查
+  Plug 'W0rp/ale'
+
+ " 编译测试
+  Plug 'skywind3000/asyncrun.vim'
+
+ " Auto Complete
+  Plug 'ycm-core/YouCompleteMe'
+  "Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+ " Git
+  Plug 'rhysd/conflict-marker.vim'
+  Plug 'tpope/vim-fugitive'
+  Plug 'mhinz/vim-signify'
+  Plug 'gisphm/vim-gitignore', { 'for': ['gitignore', 'vim-plug'] }
+
+ " Markdown
+  Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install_sync() }, 'for' :['markdown', 'vim-plug'] }
+  Plug 'dhruvasagar/vim-table-mode', { 'on': 'TableModeToggle' }
+  Plug 'vimwiki/vimwiki'
+
+ " 自动索引
+  Plug 'ludovicchabant/vim-gutentags'
+
+ " 文本对象
+  Plug 'kana/vim-textobj-user'
+  Plug 'kana/vim-textobj-indent'
+  Plug 'kana/vim-textobj-syntax'
+  Plug 'kana/vim-textobj-function', { 'for':['c', 'cpp', 'vim', 'java'] }
+  Plug 'sgur/vim-textobj-parameter'
+
+ " 代码注释
+  Plug 'tpope/vim-commentary'  " gc注释/取消注释    
+
+ " 参数提示
+  Plug 'Shougo/echodoc.vim'
+
+ call plug#end()
+
+
+" ==============File navigation================
+
+" ===
+" === NERDTree
+" ===
+ map tt :NERDTreeToggle<CR>
+ let NERDTreeMapOpenExpl = ""
+ let NERDTreeMapUpdir = ""
+ let NERDTreeMapUpdirKeepOpen = "l"
+ let NERDTreeMapOpenSplit = ""
+ let NERDTreeOpenVSplit = ""
+ let NERDTreeMapActivateNode = "i"
+ let NERDTreeMapOpenInTab = "o"
+ let NERDTreeMapPreview = ""
+ let NERDTreeMapCloseDir = "n"
+ let NERDTreeMapChangeRoot = "y"
+
+
+" ==
+" == NERDTree-git
+" ==
+ let g:NERDTreeIndicatorMapCustom = {
+    \ "Modified"  : "✹",
+    \ "Staged"    : "✚",
+    \ "Untracked" : "✭",
+    \ "Renamed"   : "➜",
+    \ "Unmerged"  : "═",
+    \ "Deleted"   : "✖",
+    \ "Dirty"     : "✗",
+    \ "Clean"     : "✔︎",
+    \ "Unknown"   : "?"
+    \ }
+
+
+" ==
+" == leadf 
+" ==
+ let g:Lf_ShortcutF = '<c-p>'
+ let g:Lf_ShortcutB = '<m-n>'
+ noremap <c-n> :LeaderfMru<cr>
+ noremap <m-p> :LeaderfFunction!<cr>
+ noremap <m-n> :LeaderfBuffer<cr>
+ noremap <m-m> :LeaderfTag<cr>
+ let g:Lf_StlSeparator = { 'left': '', 'right': '', 'font': '' }
+ let g:Lf_RootMarkers = ['.project', '.root', '.svn', '.git']
+ let g:Lf_WorkingDirectoryMode = 'Ac'
+ let g:Lf_WindowHeight = 0.30
+ let g:Lf_CacheDirectory = expand('~/.vim/cache')
+ let g:Lf_ShowRelativePath = 0
+ let g:Lf_HideHelp = 1
+ let g:Lf_StlColorscheme = 'powerline'
+ let g:Lf_PreviewResult = {'Function':0, 'BufTag':0}
+
+
+" ==
+" == easy-motion
+" ==
+ map <Leader><Leader>w <Plug>(easymotion-w)
+ map <Leader><Leader>f <Plug>(easymotion-f)
+ map <Leader><Leader>b <Plug>(easymotion-b)
+ nmap ss <Plug>(easymotion-s2)
+ "nmap sd <Plug>(easymotion-s)
+ "nmap sf <Plug>(easymotion-overwin-f)
+ "map  sh <Plug>(easymotion-linebackward)
+ "map  sl <Plug>(easymotion-lineforward)
+
+
+" ===================Taglist=========================
+
+" ===
+" === Taglist
+" ===
+ map <silent> T :TagbarOpenAutoClose<CR>
+
+" ===================语法检查=========================
+
+" ==
+" == ale  
+" ==
+ let g:ale_sign_column_always = 1                              "始终开启标志列
+ let g:ale_set_highlights = 0
+ let g:ale_sign_error = '✗'                                   "自定义error和warning图标
+ let g:ale_sign_warning = '⚡'
+ let g:ale_statusline_format = ['✗ %d', '⚡ %d', '✔ OK']       "在vim自带的状态栏中整合ale
+ let g:ale_echo_msg_error_str = 'E'                            "显示Linter名称,出错或警告等相关信息
+ let g:ale_echo_msg_warning_str = 'W' 
+ let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+ nmap sp <Plug>(ale_previous_wrap)                            "普通模式下，sp前往上一个错误或警告，sn前往下一个错误或警告
+ nmap sn <Plug>(ale_next_wrap)
+ nmap <Leader>s :ALEToggle<CR>                                "<Leader>s触发/关闭语法检查
+ nmap <Leader>d :ALEDetail<CR>                                "<Leader>s触发/关闭语法检查
+
+" ===================编译测试=========================
+
+" ==
+" == asyncrun.vim   
+" ==
+ let g:asyncrun_open = 6                                                                                     "自动打开 quickfix window,高度为6
+ let g:asyncrun_bell = 1                                                                                     "任务结束时候响铃
+ nnoremap <F10> :call asyncrun#quickfix_toggle(6)<cr>                                                        "设置F10打开/关闭 Quickfix 窗口
+ nnoremap <silent> <F9> :AsyncRun gcc -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>  "F9 为编译单文件
+ nnoremap <silent> <F5> :AsyncRun -cwd=$(VIM_FILEDIR) -mode=4 "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>         "F5 为单文件运行
+ "let g:asyncrun_rootmarks = ['.svn', '.git', '.root', '_darcs', 'build.xml']                                "定位到文件所属项目的目录
+ "nnoremap <silent> <F7> :AsyncRun -cwd=<root> make <cr>                                                     "F7 编译整个项目
+
+" ===================Auto Complete===================
+
+" ==
+" == YouCompleteMe 
+" ==
+ let g:ycm_add_preview_to_completeopt = 0
+ let g:ycm_show_diagnostics_ui = 0
+ let g:ycm_server_log_level = 'info'
+ let g:ycm_min_num_identifier_candidate_chars = 2
+ let g:ycm_collect_identifiers_from_comments_and_strings = 1
+ let g:ycm_complete_in_strings=1
+ let g:ycm_key_invoke_completion = '<c-z>'
+ set completeopt=menu,menuone
+ noremap <c-z> <NOP>
+ let g:ycm_semantic_triggers =  {
+           \ 'c,cpp,python,java,go,erlang,perl': ['re!\w{2}'],
+           \ 'cs,lua,javascript': ['re!\w{2}'],
+           \ }
+
+" ====================Git============================
+
+" ===
+" === vim-signiture
+" ===
+ let g:SignatureMap = {
+        \ 'Leader'             :  "m",
+        \ 'PlaceNextMark'      :  "m,",
+        \ 'ToggleMarkAtLine'   :  "m.",
+        \ 'PurgeMarksAtLine'   :  "dm-",
+        \ 'DeleteMark'         :  "dm",
+        \ 'PurgeMarks'         :  "dm/",
+        \ 'PurgeMarkers'       :  "dm?",
+        \ 'GotoNextLineAlpha'  :  "m<LEADER>",
+        \ 'GotoPrevLineAlpha'  :  "",
+        \ 'GotoNextSpotAlpha'  :  "m<LEADER>",
+        \ 'GotoPrevSpotAlpha'  :  "",
+        \ 'GotoNextLineByPos'  :  "",
+        \ 'GotoPrevLineByPos'  :  "",
+        \ 'GotoNextSpotByPos'  :  "mn",
+        \ 'GotoPrevSpotByPos'  :  "mp",
+        \ 'GotoNextMarker'     :  "",
+        \ 'GotoPrevMarker'     :  "",
+        \ 'GotoNextMarkerAny'  :  "",
+        \ 'GotoPrevMarkerAny'  :  "",
+        \ 'ListLocalMarks'     :  "m/",
+        \ 'ListLocalMarkers'   :  "m?"
+        \ }
+
+" ====================Markdown=======================
+
+" ===
+" === MarkdownPreview
+" ===
+ let g:mkdp_auto_start = 0
+ let g:mkdp_auto_close = 1
+ let g:mkdp_refresh_slow = 0
+ let g:mkdp_command_for_global = 0
+ let g:mkdp_open_to_the_world = 0
+ let g:mkdp_open_ip = ''
+ let g:mkdp_browser = 'chromium'
+ let g:mkdp_echo_preview_url = 0
+ let g:mkdp_browserfunc = ''
+ let g:mkdp_preview_options = {
+    \ 'mkit': {},
+    \ 'katex': {},
+    \ 'uml': {},
+    \ 'maid': {},
+    \ 'disable_sync_scroll': 0,
+    \ 'sync_scroll_type': 'middle',
+    \ 'hide_yaml_meta': 1
+    \ }
+ let g:mkdp_markdown_css = ''
+ let g:mkdp_highlight_css = ''
+ let g:mkdp_port = ''
+ let g:mkdp_page_title = '「${name}」'
+
+
+" ===
+" === vim-table-mode
+" ===
+ map <LEADER>tm :TableModeToggle<CR>
+
+" ====================自动索引=======================
+
+" ==
+" == vim-gutentags   
+" ==
+ let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']        " gutentags 搜索工程目录的标志，碰到这些文件/目录名就停止向上一级目录递归
+ let g:gutentags_ctags_tagfile = '.tags'                                            " 所生成的数据文件的名称
+ let s:vim_tags = expand('~/.cache/tags')                                           " 将自动生成的 tags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
+ let g:gutentags_cache_dir = s:vim_tags
+ let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']               " 配置 ctags 的参数
+ let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
+ let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
+ if !isdirectory(s:vim_tags)                                                        " 检测 ~/.cache/tags 不存在就新建
+   silent! call mkdir(s:vim_tags, 'p')
+ endif
+
+" =====================参数提示======================
+
+" ==
+" == echodoc.vim 
+" ==
+ set noshowmode
+
+" ==================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"map ppp :call AddTitle()<CR>
+function! AddTitle()
+  call setline(1,"/*================================================================") 
+	call append(line("."),   "*   Copyright (C) ".strftime("%Y")." Sangfor Ltd. All rights reserved.")
+	call append(line(".")+1, "*   ") 
+	call append(line(".")+2, "*   Filename：".expand("%:t")) 
+	call append(line(".")+3, "*   Author：GuoShixian")
+	call append(line(".")+4, "*   Email：729841861@qq.com") 
+	call append(line(".")+5, "*   Last modified：".strftime("%Y年%m月%d日")) 
+	call append(line(".")+6, "*   Describe：")
+	call append(line(".")+7, "================================================================*/") 
+	call append(line(".")+8, "")
+	call append(line(".")+9, "")
+   echohl WarningMsg | echo "Successful in adding copyright." | echohl None
+endfunction
+
